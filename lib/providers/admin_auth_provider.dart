@@ -30,20 +30,14 @@ class AdminAuthState {
   }
 }
 
-/// Login is intentionally restricted to accounts with role='admin' in
-/// the profiles table. Anyone else (a customer/mechanic account that
-/// knows valid credentials) is signed back out immediately with a
-/// clear message — this panel is not meant to be reachable by them,
-/// even though their login itself succeeds against Supabase auth.
-class AdminAuthNotifier extends StateNotifier<AdminAuthState> {
-  AdminAuthNotifier() : super(const AdminAuthState()) {
-    _checkExistingSession();
-  }
-
-  Future<void> _checkExistingSession() async {
+class AdminAuthNotifier extends Notifier<AdminAuthState> {
+  @override
+  AdminAuthState build() {
     final user = supabase.auth.currentUser;
-    if (user == null) return;
-    await _verifyAdminAndSetState(user.id);
+    if (user != null) {
+      _verifyAdminAndSetState(user.id);
+    }
+    return const AdminAuthState();
   }
 
   Future<void> login(String email, String password) async {
@@ -92,6 +86,4 @@ class AdminAuthNotifier extends StateNotifier<AdminAuthState> {
   }
 }
 
-final adminAuthProvider = StateNotifierProvider<AdminAuthNotifier, AdminAuthState>(
-  (ref) => AdminAuthNotifier(),
-);
+final adminAuthProvider = NotifierProvider<AdminAuthNotifier, AdminAuthState>(AdminAuthNotifier.new);
