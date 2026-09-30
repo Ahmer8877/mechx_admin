@@ -17,10 +17,16 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
 
   static const _statuses = ['all', 'pending', 'offered', 'accepted', 'on_the_way', 'in_progress', 'completed', 'cancelled'];
 
+  num _parsePrice(dynamic val) {
+    if (val is num) return val;
+    if (val is String) return num.tryParse(val) ?? 0;
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     final bookingsAsync = ref.watch(allBookingsProvider(_filter));
-    final currency = NumberFormat.currency(locale: 'en_PK', symbol: 'PKR ', decimalDigits: 0);
+    final currency = NumberFormat.currency(symbol: 'Rs. ', decimalDigits: 0);
 
     return ListView(
       padding: const EdgeInsets.all(28),
@@ -69,9 +75,9 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                   DataColumn(label: Text('Date')),
                 ],
                 rows: bookings.map((b) {
-                  final customer = (b['customer'] as Map?)?['full_name'] ?? '—';
-                  final mechanic = (b['mechanic'] as Map?)?['full_name'] ?? 'Unassigned';
-                  final price = (b['agreed_price'] as num?) ?? (b['budget_price'] as num?) ?? 0;
+                  final customer = b['customer'] is Map ? (b['customer']['full_name'] ?? '—') : '—';
+                  final mechanic = b['mechanic'] is Map ? (b['mechanic']['full_name'] ?? 'Unassigned') : 'Unassigned';
+                  final price = _parsePrice(b['agreed_price'] ?? b['budget_price']);
                   final date = DateTime.tryParse(b['created_at']?.toString() ?? '');
                   return DataRow(cells: [
                     DataCell(Text(b['service_title']?.toString() ?? '—')),

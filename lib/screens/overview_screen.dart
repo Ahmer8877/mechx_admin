@@ -8,12 +8,18 @@ import '../widgets/dashboard_atoms.dart';
 class OverviewScreen extends ConsumerWidget {
   const OverviewScreen({super.key});
 
+  num _parsePrice(dynamic val) {
+    if (val is num) return val;
+    if (val is String) return num.tryParse(val) ?? 0;
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final countsAsync = ref.watch(overviewCountsProvider);
     final earningsAsync = ref.watch(totalEarningsProvider);
     final bookingsAsync = ref.watch(recentBookingsProvider);
-    final currency = NumberFormat.currency(locale: 'en_PK', symbol: 'PKR ', decimalDigits: 0);
+    final currency = NumberFormat.currency(symbol: 'Rs. ', decimalDigits: 0);
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -34,21 +40,27 @@ class OverviewScreen extends ConsumerWidget {
             data: (counts) => earningsAsync.when(
               loading: () => const _StatsSkeleton(),
               error: (e, _) => const _StatsSkeleton(),
-              data: (earnings) => GridView.count(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 4,
-                mainAxisSpacing: 14,
-                crossAxisSpacing: 14,
-                childAspectRatio: 2.4,
-                children: [
+              data: (earnings) {
+                final statCards = [
                   StatCard(label: 'Total Customers', value: '${counts['customers'] ?? 0}', icon: Icons.people_outline),
                   StatCard(label: 'Total Mechanics', value: '${counts['mechanics'] ?? 0}', icon: Icons.build_circle_outlined, accentColor: AppColors.accent),
                   StatCard(label: 'Total Bookings', value: '${counts['bookings'] ?? 0}', icon: Icons.receipt_long_outlined),
                   StatCard(label: 'Completed Jobs', value: '${counts['completed'] ?? 0}', icon: Icons.check_circle_outline, accentColor: AppColors.success),
                   StatCard(label: 'Total Earnings (Paid)', value: currency.format(earnings), icon: Icons.payments_outlined, accentColor: AppColors.primary),
-                ],
-              ),
+                ];
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 280,
+                    mainAxisExtent: 82,
+                    mainAxisSpacing: 14,
+                    crossAxisSpacing: 14,
+                  ),
+                  itemCount: statCards.length,
+                  itemBuilder: (context, index) => statCards[index],
+                );
+              },
             ),
           ),
           const SizedBox(height: 28),
@@ -74,9 +86,9 @@ class OverviewScreen extends ConsumerWidget {
                     DataColumn(label: Text('Date')),
                   ],
                   rows: bookings.map((b) {
-                    final customer = (b['customer'] as Map?)?['full_name'] ?? '—';
-                    final mechanic = (b['mechanic'] as Map?)?['full_name'] ?? 'Unassigned';
-                    final price = (b['agreed_price'] as num?) ?? (b['budget_price'] as num?) ?? 0;
+                    final customer = b['customer'] is Map ? (b['customer']['full_name'] ?? '—') : '—';
+                    final mechanic = b['mechanic'] is Map ? (b['mechanic']['full_name'] ?? 'Unassigned') : 'Unassigned';
+                    final price = _parsePrice(b['agreed_price'] ?? b['budget_price']);
                     final date = DateTime.tryParse(b['created_at']?.toString() ?? '');
                     return DataRow(cells: [
                       DataCell(Text(b['service_title']?.toString() ?? '—')),
@@ -101,14 +113,22 @@ class _StatsSkeleton extends StatelessWidget {
   const _StatsSkeleton();
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
+    return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 4,
-      mainAxisSpacing: 14,
-      crossAxisSpacing: 14,
-      childAspectRatio: 2.4,
-      children: List.generate(4, (_) => Container(decoration: BoxDecoration(color: AppColors.surface2, borderRadius: BorderRadius.circular(14)))),
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 280,
+        mainAxisExtent: 82,
+        mainAxisSpacing: 14,
+        crossAxisSpacing: 14,
+      ),
+      itemCount: 5,
+      itemBuilder: (context, index) => Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface2,
+          borderRadius: BorderRadius.circular(14),
+        ),
+      ),
     );
   }
 }

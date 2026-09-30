@@ -7,13 +7,19 @@ class StatCard extends StatelessWidget {
   final IconData icon;
   final Color? accentColor;
 
-  const StatCard({super.key, required this.label, required this.value, required this.icon, this.accentColor});
+  const StatCard({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.icon,
+    this.accentColor,
+  });
 
   @override
   Widget build(BuildContext context) {
     final color = accentColor ?? AppColors.primary;
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(14),
@@ -24,17 +30,34 @@ class StatCard extends StatelessWidget {
           Container(
             width: 42,
             height: 42,
-            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(11)),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(11),
+            ),
             alignment: Alignment.center,
             child: Icon(icon, color: color, size: 21),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-                Text(label, style: const TextStyle(fontSize: 11.5, color: AppColors.textMuted)),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    value,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             ),
           ),
@@ -49,10 +72,14 @@ class StatusBadge extends StatelessWidget {
   const StatusBadge({super.key, required this.status});
 
   Color _color() {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'completed':
+      case 'approved':
+      case 'verified':
         return AppColors.success;
       case 'cancelled':
+      case 'rejected':
+      case 'declined':
         return AppColors.danger;
       case 'pending':
         return AppColors.warning;

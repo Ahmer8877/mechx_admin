@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config/supabase_config.dart';
@@ -53,30 +54,43 @@ class AdminAuthNotifier extends Notifier<AdminAuthState> {
     } on AuthException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.message);
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: 'Something went wrong. Try again.');
+      state = state.copyWith(isLoading: false, errorMessage: 'Something went wrong: $e');
     }
   }
 
   Future<void> _verifyAdminAndSetState(String userId) async {
     try {
       final profile = await supabase.from('profiles').select('full_name, role').eq('id', userId).maybeSingle();
-      if (profile == null || profile['role'] != 'admin') {
+      if (profile == null) {
         await supabase.auth.signOut();
         state = state.copyWith(
           isLoading: false,
           isLoggedIn: false,
-          errorMessage: 'This account does not have admin access.',
+          errorMessage: 'No profile record found in database for this account.',
+        );
+        return;
+      }
+      if (profile['role'] != 'admin') {
+        await supabase.auth.signOut();
+        state = state.copyWith(
+          isLoading: false,
+          isLoggedIn: false,
+          errorMessage: 'This account role is "${profile['role']}", not "admin".',
         );
         return;
       }
       state = state.copyWith(
         isLoading: false,
         isLoggedIn: true,
-        adminName: profile['full_name'] as String? ?? 'Admin',
+        adminName: profile['full_name']?.toString() ?? 'Admin',
         errorMessage: null,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: 'Could not verify admin access.');
+      debugPrint('Verify admin error: $e');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Could not verify admin access: ${e is PostgrestException ? e.message : e.toString()}',
+      );
     }
   }
 
