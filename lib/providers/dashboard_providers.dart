@@ -1,86 +1,92 @@
-import 'package:flutter/foundation.dart';
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../config/supabase_config.dart';
 import '../repositories/admin_repository.dart';
+import 'admin_realtime_service.dart';
 
 final adminRepositoryProvider = Provider<AdminRepository>((ref) => const AdminRepository());
+
+final adminRealtimeProvider = Provider<AdminRealtimeService>((ref) {
+  final service = AdminRealtimeService.instance;
+  service.start();
+  return service;
+});
+
+Stream<void> _adminEvents(Ref ref) {
+  final realtime = ref.read(adminRealtimeProvider);
+  return Stream<void>.periodic(const Duration(seconds: 10))
+      .mergeWith(realtime.changes);
+}
 
 final overviewCountsProvider = StreamProvider.autoDispose<Map<String, int>>((ref) async* {
   final repo = ref.read(adminRepositoryProvider);
   yield await repo.fetchOverviewCounts();
-
-  try {
-    yield* supabase
-        .from('profiles')
-        .stream(primaryKey: ['id'])
-        .handleError((e) => debugPrint('Overview profiles stream error: $e'))
-        .asyncMap((_) => repo.fetchOverviewCounts());
-  } catch (_) {}
+  await for (final _ in _adminEvents(ref)) {
+    yield await repo.fetchOverviewCounts();
+  }
 });
 
 final totalEarningsProvider = StreamProvider.autoDispose<double>((ref) async* {
   final repo = ref.read(adminRepositoryProvider);
   yield await repo.fetchTotalEarnings();
-
-  try {
-    yield* supabase
-        .from('bookings')
-        .stream(primaryKey: ['id'])
-        .handleError((e) => debugPrint('Earnings stream error: $e'))
-        .asyncMap((_) => repo.fetchTotalEarnings());
-  } catch (_) {}
+  await for (final _ in _adminEvents(ref)) {
+    yield await repo.fetchTotalEarnings();
+  }
 });
 
 final recentBookingsProvider = StreamProvider.autoDispose<List<Map<String, dynamic>>>((ref) async* {
   final repo = ref.read(adminRepositoryProvider);
   yield await repo.fetchRecentBookings();
-
-  try {
-    yield* supabase
-        .from('bookings')
-        .stream(primaryKey: ['id'])
-        .handleError((e) => debugPrint('Recent bookings stream error: $e'))
-        .asyncMap((_) => repo.fetchRecentBookings());
-  } catch (_) {}
+  await for (final _ in _adminEvents(ref)) {
+    yield await repo.fetchRecentBookings();
+  }
 });
 
-/// family param: role ('customer' | 'mechanic')
 final usersByRoleProvider =
     StreamProvider.autoDispose.family<List<Map<String, dynamic>>, String>((ref, role) async* {
   final repo = ref.read(adminRepositoryProvider);
   yield await repo.fetchUsers(role: role);
-
-  try {
-    yield* supabase
-        .from('profiles')
-        .stream(primaryKey: ['id'])
-        .handleError((e) => debugPrint('Users by role stream error: $e'))
-        .asyncMap((_) => repo.fetchUsers(role: role));
-  } catch (_) {}
+  await for (final _ in _adminEvents(ref)) {
+    yield await repo.fetchUsers(role: role);
+  }
 });
 
 final pendingMechanicsProvider = StreamProvider.autoDispose<List<Map<String, dynamic>>>((ref) async* {
   final repo = ref.read(adminRepositoryProvider);
   yield await repo.fetchPendingMechanics();
-
-  yield* supabase
-      .from('profiles')
-      .stream(primaryKey: ['id'])
-      .handleError((e) => debugPrint('Pending mechanics stream error: $e'))
-      .asyncMap((_) => repo.fetchPendingMechanics());
+  await for (final _ in _adminEvents(ref)) {
+    yield await repo.fetchPendingMechanics();
+  }
 });
 
-/// family param: status filter ('all' or a booking status)
 final allBookingsProvider =
     StreamProvider.autoDispose.family<List<Map<String, dynamic>>, String>((ref, statusFilter) async* {
   final repo = ref.read(adminRepositoryProvider);
   yield await repo.fetchAllBookings(statusFilter: statusFilter);
-
-  try {
-    yield* supabase
-        .from('bookings')
-        .stream(primaryKey: ['id'])
-        .handleError((e) => debugPrint('All bookings stream error: $e'))
-        .asyncMap((_) => repo.fetchAllBookings(statusFilter: statusFilter));
-  } catch (_) {}
+  await for (final _ in _adminEvents(ref)) {
+    yield await repo.fetchAllBookings(statusFilter: statusFilter);
+  }
 });
+
+extension _StreamMerge<T> on Stream<T> {
+  Stream<T> mergeWith(Stream<T> other) {
+    final controller = StreamController<T>();
+    late StreamSubscription<T> a;
+    late StreamSubscription<T> b;
+    var closed = false;
+
+    void closeIfDone() {
+      if (!closed) {
+        closed = true;
+        controller.close();
+      }
+    }
+
+    a = listen(controller.add, onError: controller.addError, onDone: closeIfDone);
+    b = other.listen(controller.add, onError: controller.addError, onDone: closeIfDone);
+    controller.onCancel = () async {
+      await a.cancel();
+      await b.cancel();
+    };
+    return controller.stream;
+  }
+}
