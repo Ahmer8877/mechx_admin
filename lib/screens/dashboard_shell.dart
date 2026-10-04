@@ -6,6 +6,7 @@ import 'overview_screen.dart';
 import 'customers_screen.dart';
 import 'mechanics_screen.dart';
 import 'bookings_screen.dart';
+import 'support_screen.dart';
 
 class DashboardShell extends ConsumerStatefulWidget {
   const DashboardShell({super.key});
@@ -22,6 +23,7 @@ class _DashboardShellState extends ConsumerState<DashboardShell> {
     CustomersScreen(),
     MechanicsScreen(),
     BookingsScreen(),
+    SupportScreen(),
   ];
 
   @override

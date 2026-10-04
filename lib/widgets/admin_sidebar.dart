@@ -20,6 +20,7 @@ class AdminSidebar extends StatelessWidget {
     (Icons.people_outline, 'Customers'),
     (Icons.build_circle_outlined, 'Mechanics'),
     (Icons.receipt_long_outlined, 'Bookings'),
+    (Icons.support_agent_outlined, 'Help & Support'),
   ];
 
   @override
@@ -37,12 +38,28 @@ class AdminSidebar extends StatelessWidget {
                 Container(
                   width: 32,
                   height: 32,
-                  decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(9)),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent,
+                    borderRadius: BorderRadius.circular(9),
+                  ),
                   alignment: Alignment.center,
-                  child: const Text('M', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.onAccent)),
+                  child: const Text(
+                    'M',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.onAccent,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 10),
-                const Text('MechX Admin', style: TextStyle(color: AppColors.onPrimary, fontWeight: FontWeight.w700, fontSize: 16)),
+                const Text(
+                  'MechX Admin',
+                  style: TextStyle(
+                    color: AppColors.onPrimary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
+                ),
               ],
             ),
           ),
@@ -54,20 +71,29 @@ class AdminSidebar extends StatelessWidget {
               onTap: () => onSelect(e.key),
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: selected ? Colors.white.withValues(alpha: 0.12) : null,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
                   children: [
-                    Icon(e.value.$1, size: 19, color: selected ? AppColors.accent : Colors.white70),
+                    Icon(
+                      e.value.$1,
+                      size: 19,
+                      color: selected ? AppColors.accent : Colors.white70,
+                    ),
                     const SizedBox(width: 12),
                     Text(
                       e.value.$2,
                       style: TextStyle(
                         color: selected ? Colors.white : Colors.white70,
-                        fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                        fontWeight: selected
+                            ? FontWeight.w600
+                            : FontWeight.w400,
                         fontSize: 13.5,
                       ),
                     ),
@@ -87,16 +113,28 @@ class AdminSidebar extends StatelessWidget {
                   backgroundColor: Colors.white24,
                   child: Text(
                     adminName.isNotEmpty ? adminName[0].toUpperCase() : 'A',
-                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(adminName, style: const TextStyle(color: Colors.white, fontSize: 12.5), overflow: TextOverflow.ellipsis),
+                  child: Text(
+                    adminName,
+                    style: const TextStyle(color: Colors.white, fontSize: 12.5),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 IconButton(
                   onPressed: onLogout,
-                  icon: const Icon(Icons.logout, size: 17, color: Colors.white70),
+                  icon: const Icon(
+                    Icons.logout,
+                    size: 17,
+                    color: Colors.white70,
+                  ),
                   tooltip: 'Logout',
                 ),
               ],

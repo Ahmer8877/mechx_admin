@@ -15,7 +15,16 @@ class BookingsScreen extends ConsumerStatefulWidget {
 class _BookingsScreenState extends ConsumerState<BookingsScreen> {
   String _filter = 'all';
 
-  static const _statuses = ['all', 'pending', 'offered', 'accepted', 'on_the_way', 'in_progress', 'completed', 'cancelled'];
+  static const _statuses = [
+    'all',
+    'pending',
+    'offered',
+    'accepted',
+    'on_the_way',
+    'in_progress',
+    'completed',
+    'cancelled',
+  ];
 
   num _parsePrice(dynamic val) {
     if (val is num) return val;
@@ -37,9 +46,18 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Bookings', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
+                  Text(
+                    'Bookings',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+                  ),
                   SizedBox(height: 4),
-                  Text('Every booking across the platform', style: TextStyle(fontSize: 12.5, color: AppColors.textMuted)),
+                  Text(
+                    'Every booking across the platform',
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: AppColors.textMuted,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -47,7 +65,16 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
               value: _filter,
               underline: const SizedBox(),
               items: _statuses
-                  .map((s) => DropdownMenuItem(value: s, child: Text(s == 'all' ? 'All Statuses' : s.replaceAll('_', ' ').toUpperCase())))
+                  .map(
+                    (s) => DropdownMenuItem(
+                      value: s,
+                      child: Text(
+                        s == 'all'
+                            ? 'All Statuses'
+                            : s.replaceAll('_', ' ').toUpperCase(),
+                      ),
+                    ),
+                  )
                   .toList(),
               onChanged: (v) => setState(() => _filter = v ?? 'all'),
             ),
@@ -57,11 +84,20 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
         SectionCard(
           padding: EdgeInsets.zero,
           child: bookingsAsync.when(
-            loading: () => const Padding(padding: EdgeInsets.all(30), child: Center(child: CircularProgressIndicator())),
-            error: (e, _) => Padding(padding: const EdgeInsets.all(20), child: Text('Could not load bookings: $e')),
+            loading: () => const Padding(
+              padding: EdgeInsets.all(30),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (e, _) => Padding(
+              padding: const EdgeInsets.all(20),
+              child: Text('Could not load bookings: $e'),
+            ),
             data: (bookings) {
               if (bookings.isEmpty) {
-                return const Padding(padding: EdgeInsets.all(24), child: Text('No bookings match this filter.'));
+                return const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Text('No bookings match this filter.'),
+                );
               }
               return DataTable(
                 headingRowColor: WidgetStateProperty.all(AppColors.surface2),
@@ -75,19 +111,47 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                   DataColumn(label: Text('Date')),
                 ],
                 rows: bookings.map((b) {
-                  final customer = b['customer'] is Map ? (b['customer']['full_name'] ?? '—') : '—';
-                  final mechanic = b['mechanic'] is Map ? (b['mechanic']['full_name'] ?? 'Unassigned') : 'Unassigned';
-                  final price = _parsePrice(b['agreed_price'] ?? b['budget_price']);
-                  final date = DateTime.tryParse(b['created_at']?.toString() ?? '');
-                  return DataRow(cells: [
-                    DataCell(Text(b['service_title']?.toString() ?? '—')),
-                    DataCell(Text(customer.toString())),
-                    DataCell(Text(mechanic.toString())),
-                    DataCell(SizedBox(width: 160, child: Text(b['pickup_address']?.toString() ?? '—', overflow: TextOverflow.ellipsis))),
-                    DataCell(StatusBadge(status: b['status']?.toString() ?? 'pending')),
-                    DataCell(Text(currency.format(price))),
-                    DataCell(Text(date != null ? DateFormat('d MMM, h:mm a').format(date) : '—')),
-                  ]);
+                  final customer = b['customer'] is Map
+                      ? (b['customer']['full_name'] ?? '—')
+                      : '—';
+                  final mechanic = b['mechanic'] is Map
+                      ? (b['mechanic']['full_name'] ?? 'Unassigned')
+                      : 'Unassigned';
+                  final price = _parsePrice(
+                    b['agreed_price'] ?? b['budget_price'],
+                  );
+                  final date = DateTime.tryParse(
+                    b['created_at']?.toString() ?? '',
+                  )?.toLocal();
+                  return DataRow(
+                    cells: [
+                      DataCell(Text(b['service_title']?.toString() ?? '—')),
+                      DataCell(Text(customer.toString())),
+                      DataCell(Text(mechanic.toString())),
+                      DataCell(
+                        SizedBox(
+                          width: 160,
+                          child: Text(
+                            b['pickup_address']?.toString() ?? '—',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                      DataCell(
+                        StatusBadge(
+                          status: b['status']?.toString() ?? 'pending',
+                        ),
+                      ),
+                      DataCell(Text(currency.format(price))),
+                      DataCell(
+                        Text(
+                          date != null
+                              ? DateFormat('d MMM, h:mm a').format(date)
+                              : '—',
+                        ),
+                      ),
+                    ],
+                  );
                 }).toList(),
               );
             },

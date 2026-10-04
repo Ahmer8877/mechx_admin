@@ -56,7 +56,9 @@ class AdminRealtimeService {
         callback: changed,
       )
       ..subscribe((status, error) {
-        debugPrint('Admin Realtime status: $status${error == null ? '' : ' | $error'}');
+        debugPrint(
+          'Admin Realtime status: $status${error == null ? '' : ' | $error'}',
+        );
         if (status == RealtimeSubscribeStatus.subscribed) {
           _reconnectTimer?.cancel();
           _reconnectTimer = null;

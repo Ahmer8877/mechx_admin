@@ -48,13 +48,19 @@ class StatCard extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     value,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   label,
-                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textMuted,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -93,10 +99,18 @@ class StatusBadge extends StatelessWidget {
     final c = _color();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-      decoration: BoxDecoration(color: c.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(7)),
+      decoration: BoxDecoration(
+        color: c.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(7),
+      ),
       child: Text(
         status.replaceAll('_', ' ').toUpperCase(),
-        style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: c, letterSpacing: 0.3),
+        style: TextStyle(
+          fontSize: 9.5,
+          fontWeight: FontWeight.w700,
+          color: c,
+          letterSpacing: 0.3,
+        ),
       ),
     );
   }
@@ -105,7 +119,11 @@ class StatusBadge extends StatelessWidget {
 class SectionCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
-  const SectionCard({super.key, required this.child, this.padding = const EdgeInsets.all(18)});
+  const SectionCard({
+    super.key,
+    required this.child,
+    this.padding = const EdgeInsets.all(18),
+  });
 
   @override
   Widget build(BuildContext context) {

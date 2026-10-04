@@ -17,7 +17,10 @@ class CustomersScreen extends ConsumerWidget {
       children: [
         Row(
           children: [
-            const Text('Customers', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
+            const Text(
+              'Customers',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+            ),
             const Spacer(),
             IconButton(
               onPressed: () => ref.invalidate(usersByRoleProvider('customer')),
@@ -27,16 +30,28 @@ class CustomersScreen extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 4),
-        const Text('Everyone registered as a customer', style: TextStyle(fontSize: 12.5, color: AppColors.textMuted)),
+        const Text(
+          'Everyone registered as a customer',
+          style: TextStyle(fontSize: 12.5, color: AppColors.textMuted),
+        ),
         const SizedBox(height: 18),
         SectionCard(
           padding: EdgeInsets.zero,
           child: usersAsync.when(
-            loading: () => const Padding(padding: EdgeInsets.all(30), child: Center(child: CircularProgressIndicator())),
-            error: (e, _) => Padding(padding: const EdgeInsets.all(20), child: Text('Could not load customers: $e')),
+            loading: () => const Padding(
+              padding: EdgeInsets.all(30),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (e, _) => Padding(
+              padding: const EdgeInsets.all(20),
+              child: Text('Could not load customers: $e'),
+            ),
             data: (users) {
               if (users.isEmpty) {
-                return const Padding(padding: EdgeInsets.all(24), child: Text('No customers yet.'));
+                return const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Text('No customers yet.'),
+                );
               }
               return DataTable(
                 headingRowColor: WidgetStateProperty.all(AppColors.surface2),
@@ -47,13 +62,23 @@ class CustomersScreen extends ConsumerWidget {
                   DataColumn(label: Text('Joined')),
                 ],
                 rows: users.map((u) {
-                  final date = DateTime.tryParse(u['created_at']?.toString() ?? '');
-                  return DataRow(cells: [
-                    DataCell(Text(u['full_name']?.toString() ?? '—')),
-                    DataCell(Text(u['phone_number']?.toString() ?? '—')),
-                    DataCell(Text(u['email']?.toString() ?? '—')),
-                    DataCell(Text(date != null ? DateFormat('d MMM yyyy').format(date) : '—')),
-                  ]);
+                  final date = DateTime.tryParse(
+                    u['created_at']?.toString() ?? '',
+                  );
+                  return DataRow(
+                    cells: [
+                      DataCell(Text(u['full_name']?.toString() ?? '—')),
+                      DataCell(Text(u['phone_number']?.toString() ?? '—')),
+                      DataCell(Text(u['email']?.toString() ?? '—')),
+                      DataCell(
+                        Text(
+                          date != null
+                              ? DateFormat('d MMM yyyy').format(date)
+                              : '—',
+                        ),
+                      ),
+                    ],
+                  );
                 }).toList(),
               );
             },

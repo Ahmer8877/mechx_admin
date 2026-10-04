@@ -44,7 +44,10 @@ class AdminAuthNotifier extends Notifier<AdminAuthState> {
   Future<void> login(String email, String password) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final res = await supabase.auth.signInWithPassword(email: email, password: password);
+      final res = await supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
       final user = res.user;
       if (user == null) {
         state = state.copyWith(isLoading: false, errorMessage: 'Login failed.');
@@ -54,13 +57,20 @@ class AdminAuthNotifier extends Notifier<AdminAuthState> {
     } on AuthException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.message);
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: 'Something went wrong: $e');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Something went wrong: $e',
+      );
     }
   }
 
   Future<void> _verifyAdminAndSetState(String userId) async {
     try {
-      final profile = await supabase.from('profiles').select('full_name, role').eq('id', userId).maybeSingle();
+      final profile = await supabase
+          .from('profiles')
+          .select('full_name, role')
+          .eq('id', userId)
+          .maybeSingle();
       if (profile == null) {
         await supabase.auth.signOut();
         state = state.copyWith(
@@ -75,7 +85,8 @@ class AdminAuthNotifier extends Notifier<AdminAuthState> {
         state = state.copyWith(
           isLoading: false,
           isLoggedIn: false,
-          errorMessage: 'This account role is "${profile['role']}", not "admin".',
+          errorMessage:
+              'This account role is "${profile['role']}", not "admin".',
         );
         return;
       }
@@ -89,7 +100,8 @@ class AdminAuthNotifier extends Notifier<AdminAuthState> {
       debugPrint('Verify admin error: $e');
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Could not verify admin access: ${e is PostgrestException ? e.message : e.toString()}',
+        errorMessage:
+            'Could not verify admin access: ${e is PostgrestException ? e.message : e.toString()}',
       );
     }
   }
@@ -100,4 +112,6 @@ class AdminAuthNotifier extends Notifier<AdminAuthState> {
   }
 }
 
-final adminAuthProvider = NotifierProvider<AdminAuthNotifier, AdminAuthState>(AdminAuthNotifier.new);
+final adminAuthProvider = NotifierProvider<AdminAuthNotifier, AdminAuthState>(
+  AdminAuthNotifier.new,
+);

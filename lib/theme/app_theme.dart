@@ -51,12 +51,26 @@ class AppTheme {
         error: AppColors.danger,
       ),
       textTheme: textTheme.copyWith(
-        headlineLarge: displayFont.headlineLarge?.copyWith(fontWeight: FontWeight.w700, color: AppColors.text),
-        headlineMedium: displayFont.headlineMedium?.copyWith(fontWeight: FontWeight.w700, color: AppColors.text),
-        titleLarge: displayFont.titleLarge?.copyWith(fontWeight: FontWeight.w600, color: AppColors.text),
-        titleMedium: displayFont.titleMedium?.copyWith(fontWeight: FontWeight.w600, color: AppColors.text),
+        headlineLarge: displayFont.headlineLarge?.copyWith(
+          fontWeight: FontWeight.w700,
+          color: AppColors.text,
+        ),
+        headlineMedium: displayFont.headlineMedium?.copyWith(
+          fontWeight: FontWeight.w700,
+          color: AppColors.text,
+        ),
+        titleLarge: displayFont.titleLarge?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: AppColors.text,
+        ),
+        titleMedium: displayFont.titleMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: AppColors.text,
+        ),
         bodyMedium: textTheme.bodyMedium?.copyWith(color: AppColors.text),
-        bodySmall: textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+        bodySmall: textTheme.bodySmall?.copyWith(
+          color: AppColors.textSecondary,
+        ),
       ),
       dividerColor: AppColors.border,
       cardTheme: CardThemeData(
@@ -70,8 +84,14 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surface2,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 12,
+        ),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.surface,

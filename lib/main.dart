@@ -9,8 +9,14 @@ import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  /// dotenv initialization
   await dotenv.load(fileName: '.env');
+
+  /// supabase initialization
   await SupabaseConfig.init();
+
+  /// app initialization wrapped in Riverpod ProviderScope
   runApp(const ProviderScope(child: MechXAdminApp()));
 }
 
@@ -37,6 +43,8 @@ class _AuthGate extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(adminAuthProvider);
-    return authState.isLoggedIn ? const DashboardShell() : const AdminLoginScreen();
+    return authState.isLoggedIn
+        ? const DashboardShell()
+        : const AdminLoginScreen();
   }
 }

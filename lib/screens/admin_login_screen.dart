@@ -11,6 +11,7 @@ class AdminLoginScreen extends ConsumerStatefulWidget {
 }
 
 class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
+  bool _showPassword = false;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -34,7 +35,13 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: AppColors.border),
-            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 30, offset: const Offset(0, 10))],
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 30,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -45,35 +52,89 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                   Container(
                     width: 40,
                     height: 40,
-                    decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(11)),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(11),
+                    ),
                     alignment: Alignment.center,
-                    child: const Text('M', style: TextStyle(color: AppColors.onPrimary, fontWeight: FontWeight.w700, fontSize: 18)),
+                    child: const Text(
+                      'M',
+                      style: TextStyle(
+                        color: AppColors.onPrimary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 12),
-                  const Text('MechX Admin', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700)),
+                  const Text(
+                    'MechX Admin',
+                    style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700),
+                  ),
                 ],
               ),
               const SizedBox(height: 6),
-              const Text('Operations dashboard — authorized personnel only', style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
+              const Text(
+                'Operations dashboard — authorized personnel only',
+                style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+              ),
               const SizedBox(height: 28),
-              const Text('EMAIL', style: TextStyle(fontSize: 10, color: AppColors.textMuted, letterSpacing: 0.5)),
+              const Text(
+                'EMAIL',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: AppColors.textMuted,
+                  letterSpacing: 0.5,
+                ),
+              ),
               const SizedBox(height: 6),
-              TextField(controller: _emailController, decoration: const InputDecoration(hintText: 'admin@mechx.com')),
+              TextField(
+                controller: _emailController,
+                decoration: const InputDecoration(hintText: 'admin@mechx.com'),
+              ),
               const SizedBox(height: 16),
-              const Text('PASSWORD', style: TextStyle(fontSize: 10, color: AppColors.textMuted, letterSpacing: 0.5)),
+              const Text(
+                'PASSWORD',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: AppColors.textMuted,
+                  letterSpacing: 0.5,
+                ),
+              ),
               const SizedBox(height: 6),
               TextField(
                 controller: _passwordController,
-                obscureText: true,
+                obscureText: !_showPassword,
                 onSubmitted: (_) => _submit(),
-                decoration: const InputDecoration(hintText: '••••••••'),
+                decoration: InputDecoration(
+                  hintText: '••••••••',
+                  suffixIcon: IconButton(
+                    tooltip: _showPassword ? 'Hide password' : 'Show password',
+                    onPressed: () =>
+                        setState(() => _showPassword = !_showPassword),
+                    icon: Icon(
+                      _showPassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                    ),
+                  ),
+                ),
               ),
               if (authState.errorMessage != null) ...[
                 const SizedBox(height: 14),
                 Container(
                   padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(color: AppColors.danger.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(8)),
-                  child: Text(authState.errorMessage!, style: const TextStyle(color: AppColors.danger, fontSize: 12)),
+                  decoration: BoxDecoration(
+                    color: AppColors.danger.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    authState.errorMessage!,
+                    style: const TextStyle(
+                      color: AppColors.danger,
+                      fontSize: 12,
+                    ),
+                  ),
                 ),
               ],
               const SizedBox(height: 22),
@@ -85,11 +146,23 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.onPrimary,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(11),
+                    ),
                   ),
                   child: authState.isLoading
-                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Text('Sign In', style: TextStyle(fontWeight: FontWeight.w600)),
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text(
+                          'Sign In',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
                 ),
               ),
             ],
